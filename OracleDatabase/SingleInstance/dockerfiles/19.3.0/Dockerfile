@@ -111,9 +111,8 @@ FROM base AS builder
 ARG DB_EDITION
 
 # Copy DB install file
-COPY --chown=oracle:dba --from=downloader /tmp/LINUX.X64_193000_db_home.zip /tmp/LINUX.X64_193000_db_home.zip
-RUN unzip -d $INSTALL_DIR/ /tmp/LINUX.X64_193000_db_home.zip && \
-    rm /tmp/LINUX.X64_193000_db_home.zip && \
+COPY --chown=oracle:dba --from=downloader /tmp/LINUX.X64_193000_db_home.zip $INSTALL_DIR/LINUX.X64_193000_db_home.zip
+RUN unzip -d $INSTALL_DIR/ $INSTALL_DIR/LINUX.X64_193000_db_home.zip && \
     chown -R oracle:dba $INSTALL_DIR
 COPY --chown=oracle:dba $INSTALL_RSP $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
 
