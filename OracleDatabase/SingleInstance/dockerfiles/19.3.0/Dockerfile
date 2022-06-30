@@ -4,7 +4,6 @@ FROM curlimages/curl:7.83.1 as downloader
 RUN curl --fail \
         --url 'https://public.bn.files.1drv.com/y4m8ZGpcIbLu6q0KCW-bq0_pig3krH33HoFpTv-om5To55WeQ62JDC8DVbd5N_kWZZ9lObo0Mqa0kf5RUrgoBJphrLvq2mUHSvKTRNl4G9JHwE2xKHE_r3CBjwi9ioz5KtBBLyuAEcjzCIE5FWiiQYvqdMze8fKnuJ8W7finEezrdxcM4L5W9OL2O2u3SLFNSaCNZegCrSLXC4VQ6k9hQpR706E3Wp25DVpm7tJvH8OJ60' \
         --output /tmp/LINUX.X64_193000_db_home.zip
-RUN unzip -d /tmp/oracle_db /tmp/LINUX.X64_193000_db_home.zip
 
 # LICENSE UPL 1.0
 #
@@ -112,7 +111,10 @@ FROM base AS builder
 ARG DB_EDITION
 
 # Copy DB install file
-COPY --chown=oracle:dba --from=downloader /tmp/oracle_db/ $INSTALL_DIR/
+COPY --chown=oracle:dba --from=downloader /tmp/LINUX.X64_193000_db_home.zip /tmp/LINUX.X64_193000_db_home.zip
+RUN unzip -d $INSTALL_DIR/ /tmp/LINUX.X64_193000_db_home.zip && \
+    rm /tmp/LINUX.X64_193000_db_home.zip && \
+    chown -R oracle:dba $INSTALL_DIR
 COPY --chown=oracle:dba $INSTALL_RSP $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
 
 # Install DB software binaries
