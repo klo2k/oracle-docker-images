@@ -1,3 +1,11 @@
+# Download the database zip
+FROM curlimages/curl:7.83.1 as downloader
+# Use curl instead of ADD to make build faster: https://github.com/moby/moby/issues/880
+RUN curl --fail \
+        --url 'https://public.bn.files.1drv.com/y4m8ZGpcIbLu6q0KCW-bq0_pig3krH33HoFpTv-om5To55WeQ62JDC8DVbd5N_kWZZ9lObo0Mqa0kf5RUrgoBJphrLvq2mUHSvKTRNl4G9JHwE2xKHE_r3CBjwi9ioz5KtBBLyuAEcjzCIE5FWiiQYvqdMze8fKnuJ8W7finEezrdxcM4L5W9OL2O2u3SLFNSaCNZegCrSLXC4VQ6k9hQpR706E3Wp25DVpm7tJvH8OJ60' \
+        --output /tmp/LINUX.X64_193000_db_home.zip
+RUN unzip -d /tmp/oracle_db /tmp/LINUX.X64_193000_db_home.zip
+
 # LICENSE UPL 1.0
 #
 # Copyright (c) 2018, 2022 Oracle and/or its affiliates.
@@ -24,6 +32,8 @@ FROM oraclelinux:7-slim as base
 
 # Labels
 # ------
+LABEL org.opencontainers.image.revision="-"
+LABEL org.opencontainers.image.source="https://github.com/klo2k/oracle-docker-images"
 LABEL "provider"="Oracle"                                               \
       "issues"="https://github.com/oracle/docker-images/issues"         \
       "volume.data"="/opt/oracle/oradata"                               \
@@ -102,7 +112,8 @@ FROM base AS builder
 ARG DB_EDITION
 
 # Copy DB install file
-COPY --chown=oracle:dba $INSTALL_FILE_1 $INSTALL_RSP $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
+COPY --chown=oracle:dba --from=downloader /tmp/oracle_db/ $INSTALL_DIR/
+COPY --chown=oracle:dba $INSTALL_RSP $INSTALL_DB_BINARIES_FILE $INSTALL_DIR/
 
 # Install DB software binaries
 USER oracle
