@@ -145,6 +145,10 @@ WORKDIR /home/oracle
 # Add a bashrc file to capitalize ORACLE_SID in the environment
 RUN echo 'ORACLE_SID=${ORACLE_SID:-ORCLCDB}; export ORACLE_SID=${ORACLE_SID^^}' > .bashrc
 
+# Workround "ORA-12637: Packet receive failed" error on sqlplus connection
+# https://github.com/oracle/docker-images/issues/1352
+RUN echo 'DISABLE_OOB=ON' >> /opt/oracle/product/19c/dbhome_1/network/admin/sqlnet.ora
+
 HEALTHCHECK --interval=1m --start-period=5m --timeout=30s \
    CMD "$ORACLE_BASE/$CHECK_DB_FILE" >/dev/null || exit 1
 
